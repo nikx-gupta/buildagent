@@ -1,12 +1,19 @@
 package buildagent
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
-func Run() {
+func Run() error {
 
 	http.DefaultServeMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("Something Invoked"))
 	})
 
-	http.ListenAndServe("::8080", nil)
+	return http.ListenAndServe("::8080", nil)
+}
+
+func main() {
+	fmt.Println("This is buildagent")
 }
