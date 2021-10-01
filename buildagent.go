@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -53,14 +54,44 @@ func HandlePushEvent(event *GitEvent) {
 	cloneDir := homeDir + "/tmp/" + event.Repository.Name + "-" + uuid.NewString()
 	fmt.Printf("Clone Dir: %s \n", cloneDir)
 
-	cmd := exec.Command("git", "clone", event.Repository.Url, cloneDir)
-	err = cmd.Run()
+	CloneRepo(cloneDir, event.Repository.Url)
+	files := FindDockerfiles(cloneDir)
+	if len(files) == 0 {
+		fmt.Printf("No Dockerfiles found")
+		return
+	}
+
+}
+
+func CloneRepo(cloneDirPath string, repoUrl string) {
+	cmd := exec.Command("git", "clone", repoUrl, cloneDirPath)
+	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("Error in Executing Git Clone: %s \n", err.Error())
 	}
 
 	cmd.Wait()
 	fmt.Println("Git clone completed")
+}
+
+func FindDockerfiles(cloneDir string) []string {
+	files, _ := filepath.Glob(cloneDir + "/*/Dockerfile")
+
+	fmt.Printf("Dockerfiles : %s", files)
+
+	return files
+}
+
+func BuildImage(filePath string) {
+	cmd := exec.Command("docker", "build", "-t", "")
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("Error in Executing Git Clone: %s \n", err.Error())
+	}
+
+	cmd.Wait()
+	fmt.Println("Git clone completed")
+
 }
 
 type GitRepository struct {
