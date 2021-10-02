@@ -11,15 +11,11 @@ type RepoConfig struct {
 	REPO_URL      string
 }
 
-func GetRepoConfig() RepoConfig {
-	config := new(RepoConfig)
-
+func (config *RepoConfig) Get() {
 	err := GetEnv(config)
 	if err != nil {
 		panic("Error in Repo config:" + err.Error())
 	}
-
-	return *config
 }
 
 func GetEnv(config *RepoConfig) error {

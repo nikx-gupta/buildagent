@@ -3,13 +3,18 @@ package buildagent
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
-var token string
+type DockerRepo struct {
+	Token string
+}
 
-func LoginRepo(config RepoConfig) error {
+func (repo *DockerRepo) Login(config RepoConfig) error {
+	if repo.Token != "" {
+		return nil
+	}
+
 	body, _ := json.Marshal(map[string]string{
 		"username": config.REPO_USERNAME,
 		"password": config.REPO_PASSWORD,
@@ -23,13 +28,13 @@ func LoginRepo(config RepoConfig) error {
 	var resBody map[string]string
 	if res.StatusCode == 200 {
 		json.NewDecoder(res.Body).Decode(&resBody)
-		fmt.Printf("Authorization Response: %s", resBody)
-		token = resBody["token"]
+		// fmt.Printf("Authorization Response: %s", resBody)
+		repo.Token = resBody["token"]
 	}
 
 	return nil
 }
 
-func LatestVersion(imageName string) {
+func (repo *DockerRepo) GetLastVersion(imageName string) {
 
 }
